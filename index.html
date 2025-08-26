@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamster Mini App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    h2 { margin: 10px 0; }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      font-size: 14px;
+    }
+    .balance {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .progress {
+      background: #333;
+      height: 10px;
+      border-radius: 5px;
+      margin: 10px auto;
+      width: 90%;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #00bfff;
+    }
+    .hamster {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      margin: 20px auto;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00bfff;
+      position: relative;
+      overflow: visible;
+    }
+    .energy {
+      margin: 10px;
+      font-size: 14px;
+    }
+    .boost, .playBtn {
+      background: orange;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      background: #222;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+    .bottom-nav div {
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .bottom-nav div.active {
+      color: #fff;
+    }
+
+    /* Flying coin animation */
+    .coin {
+      position: absolute;
+      font-size: 24px;
+      animation: fly 1s ease-out forwards;
+    }
+    @keyframes fly {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-150px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h2>LEVEL UP YOUR HAMSTER 🐹</h2>
+
+  <div class="stats">
+    <div>Earn per tap: <b id="earn">+1</b></div>
+    <div>Coins to level up: <b id="need">5000</b></div>
+    <div>Profit/hr: <b id="profit">+0</b></div>
+  </div>
+
+  <div class="balance">💰 <span id="coins">0</span></div>
+  <div>Level: <span id="level">1</span>/10</div>
+
+  <div class="progress">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
+  <div class="hamster" id="hamster">🐹</div>
+
+  <div class="energy">⚡ <span id="energy">500</span>/500</div>
+  <button class="boost" id="boostBtn">🚀 Boost</button>
+  <button class="playBtn" id="playBtn">▶️ Play</button>
+
+  <div class="bottom-nav">
+    <div class="active">🏠 Home</div>
+    <div>⛏ Main</div>
+    <div>📤 Share</div>
+    <div>💰 Earn</div>
+  </div>
+
+<script>
+  let coins = 0;
+  let level = 1;
+  let earnPerTap = 1;
+  let energy = 500;
+  let maxEnergy = 500;
+  let needToLevel = 5000;
+
+  const coinsEl = document.getElementById("coins");
+  const levelEl = document.getElementById("level");
+  const earnEl = document.getElementById("earn");
+  const needEl = document.getElementById("need");
+  const progressBar = document.getElementById("progress");
+  const energyEl = document.getElementById("energy");
+  const hamsterEl = document.getElementById("hamster");
+  const boostBtn = document.getElementById("boostBtn");
+  const playBtn = document.getElementById("playBtn");
+
+  function updateUI(){
+    coinsEl.innerText = coins;
+    levelEl.innerText = level;
+    earnEl.innerText = "+"+earnPerTap;
+    needEl.innerText = needToLevel;
+    energyEl.innerText = energy;
+    let percent = (coins % needToLevel) / needToLevel * 100;
+    progressBar.style.width = percent+"%";
+  }
+
+  function createFlyingCoin(){
+    let coin = document.createElement("div");
+    coin.classList.add("coin");
+    coin.innerText = "💰";
+    coin.style.left = (Math.random()*100 - 50) + "px";
+    hamsterEl.appendChild(coin);
+
+    setTimeout(()=>{ coin.remove(); }, 1000);
+  }
+
+  hamsterEl.addEventListener("click", ()=>{
+    if(energy > 0){
+      coins += earnPerTap;
+      energy--;
+      createFlyingCoin();
+
+      if(coins >= needToLevel){
+        coins = 0;
+        level++;
+        earnPerTap += 1;
+        needToLevel += 2000;
+        alert("🎉 Level Up! You are now Level "+level);
+      }
+      updateUI();
+    } else {
+      alert("⚡ Energy empty! Use Boost.");
+    }
+  });
+
+  boostBtn.addEventListener("click", ()=>{
+    energy = maxEnergy;
+    updateUI();
+    alert("⚡ Energy Refreshed!");
+  });
+
+  // Play বাটনে Ad স্ক্রিপ্ট লোড
+  playBtn.addEventListener("click", ()=>{
+    if(!document.getElementById("libtlScript")){
+      const script = document.createElement("script");
+      script.src = "//libtl.com/sdk.js";
+      script.dataset.zone = "9771272";
+      script.dataset.sdk = "show_9771272";
+      script.id = "libtlScript";
+      document.body.appendChild(script);
+      alert("📢 Ad Loaded!");
+    } else {
+      alert("📢 Ad Already Loaded!");
+    }
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
